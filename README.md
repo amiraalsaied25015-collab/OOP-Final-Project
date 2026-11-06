@@ -1,2 +1,174 @@
-# OOP-Final-Project
-My final project for the Object-Oriented Programming (OOP) course. Applying OOP concepts using Python.
+# Step 1: Student Class
+class Student:
+    def __init__(self, name, student_id, grade):
+        self.name = name
+        self.student_id = student_id
+        self.grade = grade
+
+    def display_info(self):
+        print(f"Student Name: {self.name}\nStudent ID: {self.student_id}\nGrade: {self.grade}")
+
+
+# Step 2: ScoreRecord Class
+class ScoreRecord:
+    def __init__(self, subject, score):
+        self.subject = subject
+        self.__score = None
+        self.set_score(score)
+
+    def get_score(self):
+        return self.__score
+
+    def set_score(self, score):
+        if 0 <= score <= 100:
+            self.__score = score
+            return True
+        else:
+            print(f"Invalid score: {score}. Score must be between 0 and 100.")
+            return False
+
+    def display_score(self):
+        print(f"Subject: {self.subject}\nScore: {self.__score}")
+
+
+# Step 3: StudentDataset Class
+class StudentDataset:
+    def __init__(self):
+        self.records = []
+
+    def add_record(self, record):
+        self.records.append(record)
+
+    def get_all_records(self):
+        return self.records
+
+
+# Step 4: Preprocessor Class
+class Preprocessor:
+    def process(self, score):
+        if 0 <= score <= 100:
+            return score
+        else:
+            print(f"Invalid score: {score}. Cannot process this score.")
+            return None
+
+
+# Step 5: StudyModel Class
+class StudyModel:
+    def predict(self, score):
+        if 85 <= score <= 100:
+            return "Excellent"
+        elif 70 <= score < 85:
+            return "Good"
+        elif 50 <= score < 70:
+            return "Needs Practice"
+        elif 0 <= score < 50:
+            return "Needs Support"
+        else:
+            return "Invalid Score"
+
+
+# Step 6: StudyAdvisor Class
+class StudyAdvisor:
+    def generate_advice(self, level):
+        if level == "Excellent":
+            return "Keep practicing advanced problems."
+        elif level == "Good":
+            return "Review mistakes and solve more exercises."
+        elif level == "Needs Practice":
+            return "Revise the lesson and practice basic questions."
+        elif level == "Needs Support":
+            return "Ask for help and start with simple examples."
+        else:
+            return "Please enter a valid performance level."
+
+
+# Step 7: Notification Classes
+class Notification:
+    def __init__(self, message):
+        self.message = message
+
+    def send(self):
+        print(f"Sending notification: {self.message}")
+
+
+class EmailNotification(Notification):
+    def send(self):
+        print(f"Email Notification: {self.message}")
+
+
+class SMSNotification(Notification):
+    def send(self):
+        print(f"SMS Notification: {self.message}")
+
+
+class AppNotification(Notification):
+    def send(self):
+        print(f"App Notification: {self.message}")
+
+
+# Step 8: ReportGenerator Class
+class ReportGenerator:
+    def display_report(self, student, score, level, advice):
+        print(
+            f"\n===== STUDENT REPORT =====\n"
+            f"Student Name: {student.name}\n"
+            f"Student ID: {student.student_id}\n"
+            f"Score: {score}\n"
+            f"Performance Level: {level}\n"
+            f"Advice: {advice}\n"
+            f"=========================="
+        )
+
+
+# Step 9: SmartStudyAdvisorPipeline Class
+class SmartStudyAdvisorPipeline:
+    def __init__(self):
+        self.preprocessor = Preprocessor()
+        self.model = StudyModel()
+        self.advisor = StudyAdvisor()
+        self.report_generator = ReportGenerator()
+        self.dataset = StudentDataset()
+
+    def run(self, student, subject, score, notification_type):
+        # Process the score
+        clean_score = self.preprocessor.process(score)
+
+        if clean_score is None:
+            return
+
+        # Create and store the score record
+        score_record = ScoreRecord(subject, clean_score)
+        self.dataset.add_record(score_record)
+
+        # Predict the performance level
+        level = self.model.predict(score_record.get_score())
+
+        # Generate advice
+        advice = self.advisor.generate_advice(level)
+
+        # Display the final report
+        self.report_generator.display_report(
+            student, score_record.get_score(), level, advice
+        )
+
+        # Send notification
+        if notification_type == "email":
+            notification = EmailNotification(advice)
+        elif notification_type == "sms":
+            notification = SMSNotification(advice)
+        elif notification_type == "app":
+            notification = AppNotification(advice)
+        else:
+            print(f"Invalid notification type: {notification_type}")
+            return
+
+        notification.send()
+
+
+# Main Program
+student1 = Student("Amira", 101, "A")
+
+pipeline = SmartStudyAdvisorPipeline()
+
+pipeline.run(student1, "Python", 90, "email")
